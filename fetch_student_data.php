@@ -2,8 +2,8 @@
 // Connect to the MySQL database
 $host = 'localhost';
 $dbName = 'Student_Directory';
-$username = 'admin';
-$password = 'NaekM_@$t3r';
+$username = 'Enter Username';
+$password = 'Enter Password';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbName;charset=utf8mb4", $username, $password);
