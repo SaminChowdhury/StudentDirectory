@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Bio</title>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            display: flex;
+        }
+        .bio-text {
+            flex: 1;
+        }
+        h1 {
+            color: #1D3B5E;
+            margin-bottom: 20px;
+            font-size: 38px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            border-bottom: 3px solid #1D3B5E;
+            text-align: right;
+            display: inline-block;
+            transform: translateX(53%);
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            margin-bottom: 10px;
+            color: #666;
+        }
+        .profile-image {
+            display: flex;
+            max-width: 300px;
+            border-radius: 75%;
+            margin-left: 0px;
+            height: 300px;
+            transform: translateY(40%);
+            margin-right: 20px;
+        }
+        #backButton {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 16px;
+            text-decoration: none; 
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="bio-text">
+            <h1>Student Bio</h1>
+            <a href="#" id="backButton">&larr; Back</a> 
+
+            <div id="bioContainer">
+                <h2 id="name"></h2>
+                <p id="email"></p>
+                <p id="idNumber"></p>
+                <p id="phoneNumber"></p>
+                <p id="expectedGraduation"></p>
+                <p id="startDate"></p>
+                <p id="position"></p>
+                <p id="group"></p>
+                <p id="assignedMentor"></p>
+                <p id="tenure"></p>
+            </div>
+        </div>
+        <img class="profile-image" id="profileImage" src="" alt="Student Image">
+    </div>
+
+    <script>
+        // Function to parse query parameters from URL
+        function getQueryParams() {
+            const search = window.location.search.substring(1);
+            const params = search.split('&');
+            const queryParams = {};
+
+            for (let i = 0; i < params.length; i++) {
+                const param = params[i].split('=');
+                const key = decodeURIComponent(param[0]);
+                const value = decodeURIComponent(param[1]);
+                queryParams[key] = value;
+            }
+
+            return queryParams;
+        }
+
+        // Function to fetch the student bio data
+        function fetchStudentData() {
+            const queryParams = getQueryParams();
+            const firstName = queryParams.firstName;
+            const lastName = queryParams.lastName;
+
+            fetch('fetch_student_data.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ firstName, lastName })
+            })
+                .then(response => response.json())
+                .then(data => {
+       // Loop to check Query First Name and last name against json file until matching card is found    
+      let i=0;
+      for (i; i < data.length; i++) {
+        if (((document.getElementById('name')).textContent = `${data[i]['First Name']}`) === firstName && ((document.getElementById('name')).textContent = `${data[i]['Last Name']}`) === lastName ) {
+          break;
+        }
+      }
+         student=data[i];
+
+               
+
+                    if (student) {
+                        const nameElement = document.getElementById('name');
+                        const emailElement = document.getElementById('email');
+                        const idNumberElement = document.getElementById('idNumber');
+                        const phoneNumberElement = document.getElementById('phoneNumber');
+                        const expectedGraduationElement = document.getElementById('expectedGraduation');
+                        const startDateElement = document.getElementById('startDate');
+                        const positionElement = document.getElementById('position');
+                        const groupElement = document.getElementById('group');
+                        const assignedMentorElement = document.getElementById('assignedMentor');
+                        const Tenure = document.getElementById('tenure');
+                        const profileImageElement = document.getElementById('profileImage');
+                        nameElement.textContent = `${student['First Name']} ${student['Last Name']}`;
+                        emailElement.textContent = `Email: ${student['Email']}`;
+                        idNumberElement.textContent = `ID Number: ${student['ID Number']}`;
+                        phoneNumberElement.textContent = `Phone Number: ${student['Phone Number']}`;
+                        expectedGraduationElement.textContent = `Expected Graduation: ${student['Expected Graduation']}`;
+                        startDateElement.textContent = `Start Date: ${student['Start Date']}`;
+                        positionElement.textContent = `Position: ${student['Position']}`;
+                        groupElement.textContent = `Group: ${student['Group']}`;
+                        assignedMentorElement.textContent = `Assigned Mentor: ${student['Assigned Mentor']}`;
+                        Tenure.textContent = `Tenure: ${student['Tenure']} days`;
+                        profileImageElement.src = `student_images/${student['ID Number']}.jpeg`;
+                        profileImageElement.alt = `${student['First Name']} ${student['Last Name']}`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching student data:', error);
+                });
+        }
+        // Back Button   
+        document.getElementById('backButton').addEventListener('click', function() {
+          history.back();
+        });
+
+        // Call the fetchStudentData function on page load
+        document.addEventListener('DOMContentLoaded', fetchStudentData);
+    </script>
+</body>
+</html>
+

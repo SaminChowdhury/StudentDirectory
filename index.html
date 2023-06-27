@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kean University OCIS Directory</title>
+    <link rel="preload" href="/student_images/{studentId}.jpeg" as="image">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #FFF;
+            padding: 0px;
+            font-family: Arial, sans-serif;
+        }
+
+       .logo {
+            width: 160px; /* Adjust the width as needed */
+            position: relative;
+            top: 25px;
+            left: 70px;
+            transform: translateY(69%);
+        }
+
+
+        h1 {
+            text-align: center;
+            color: #1D3B5E;
+            margin: 0;
+            padding: 20px;
+            background-color: #FFF;
+            width: 100%;
+            height: 12vh;
+            box-sizing: border-box;
+            font-size: 50px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            border-bottom: 3px solid #1D3B5E;
+        }
+
+        .card {
+            background-color: #FFF;
+            box-shadow: 0px 0px 15px rgba(0, 0, 1, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+        .card-image {
+            flex: 0 0 30%;
+        }
+        .card-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .card-content {
+            flex: 1;
+            padding-left: 20px;
+        }
+        .card-header h5 {
+            margin-bottom: 0;
+            color: #005EB8;
+        }
+        .card-info {
+            margin-top: 10px;
+            color: #000;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 7px;
+            margin-bottom: 15px;
+        }
+        .page-link {
+            cursor: pointer;
+            color: #005EB8;
+            text-decoration: none;
+        }
+        .page-link:hover {
+            text-decoration: underline;
+        }
+        .active .page-link {
+            background-color: #005EB8;
+            color: #FFF;
+        }
+        .card-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        @media (max-width: 991px) {
+            .card-columns {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 767px) {
+            .card-columns {
+                grid-template-columns: repeat(1, 1fr);
+            }
+        }
+        .search-bar {
+            margin-top: 12px;
+            margin-bottom: 20px;
+        }
+        .form-control {
+            background-color: #FFF;
+            color: #000;
+        }
+/* Remove default select styles */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Custom dropdown style */
+select {
+  position: fixed;
+  padding: 8px 16px;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+    bottom: 20px;
+  right: 20px;
+  z-index: 1;
+}
+
+select:hover {
+  background-color: #e0e0e0;
+}
+
+/* Arrow icon */
+select::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 6px 0 6px;
+  border-color: #333 transparent transparent transparent;
+  pointer-events: none;
+}
+
+/* Show dropdown menu on click */
+select:focus {
+  outline: none;
+}
+
+select:focus::after {
+  border-color: transparent transparent #333 transparent;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="kean-logo.png" alt="Kean Logo" class="logo">
+        <h1>OCIS Student Directory</h1>
+        <div class="search-bar">
+            <input type="text" class="form-control" id="searchInput" placeholder="Search for Student Worker">
+
+        </div>
+
+        <div id="studentCardsContainer" class="card-columns"></div>
+
+        <div class="pagination" id="paginationContainer"></div>
+  <select id="cardsPerPageSelect" onchange="updateCardsPerPage()">
+            <option value="9">9</option>
+            <option value="12">12</option>
+            <option value="15">15</option>
+            <option value="18">18</option>
+            <option value="18">21</option>
+            </select> 
+   </div>
+    <script>
+        // Global variables
+        let studentData = [];
+        let currentPage = 1;
+   
+        const cardsPerPageSelect = document.getElementById('cardsPerPageSelect');
+        let cardsPerPage = parseInt(cardsPerPageSelect.value, 10);
+
+        function updateCardsPerPage() {
+          cardsPerPage = parseInt(cardsPerPageSelect.value, 10);
+          renderStudentCards();
+        }
+        const container = document.getElementById('studentCardsContainer');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const searchInput = document.getElementById('searchInput');
+
+        // Function to fetch the student data from the database
+        function fetchStudentData() {
+            fetch('fetch_student_data.php') // Change this to the PHP file that fetches data from the database
+                .then(response => response.json())
+                .then(data => {
+                    studentData = data;
+                    renderStudentCards();
+                    renderPagination();
+                });
+        }
+
+        // Function to filter and display the student cards
+        function renderStudentCards() {
+            container.innerHTML = '';
+
+            const startIndex = (currentPage - 1) * cardsPerPage;
+            let endIndex = startIndex + cardsPerPage;
+            if (endIndex > studentData.length) {
+                endIndex = studentData.length;
+            }
+            const paginatedData = studentData.slice(startIndex, endIndex);
+
+            paginatedData.forEach(student => {
+                const card = createStudentCard(student);
+                container.appendChild(card);
+            });
+        }
+
+// Function to create a single student card
+function createStudentCard(student) {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const cardImage = document.createElement('div');
+    cardImage.className = 'card-image';
+
+    const studentImage = document.createElement('img');
+    const studentId = student['ID Number'];
+    studentImage.src = `/student_images/${studentId}.jpeg`;
+    cardImage.appendChild(studentImage);
+
+    const cardContent = document.createElement('div');
+    cardContent.className = 'card-content';
+
+    const cardHeader = document.createElement('div');
+    cardHeader.className = 'card-header';
+
+    const studentName = document.createElement('h5');
+    studentName.textContent = `${student['First Name']} ${student['Last Name']}`;
+    cardHeader.appendChild(studentName);
+
+    const cardInfo = document.createElement('div');
+    cardInfo.className = 'card-info';
+    cardInfo.innerHTML = `Email: ${student['Email']}<br>Phone: ${student['Phone Number']}`;
+
+    cardContent.appendChild(cardHeader);
+    cardContent.appendChild(cardInfo);
+    card.appendChild(cardImage);
+    card.appendChild(cardContent);
+
+    // Open bio page when card is clicked
+    card.addEventListener('click', () => {
+        window.open(`bio_page.html?firstName=${student['First Name']}&lastName=${student['Last Name']}`, '_self');
+    });
+
+    return card;
+        }
+
+        // Function to render the pagination
+        function renderPagination() {
+            paginationContainer.innerHTML = '';
+
+            const totalCards = studentData.length;
+            const totalPages = Math.ceil(totalCards / cardsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.className = 'page-link';
+                pageLink.textContent = i;
+                pageLink.addEventListener('click', () => {
+                    currentPage = i;
+                    renderStudentCards();
+                    renderPagination();
+                });
+
+                const pageItem = document.createElement('li');
+                pageItem.className = 'page-item';
+                if (i === currentPage) {
+                    pageItem.classList.add('active');
+                }
+                pageItem.appendChild(pageLink);
+
+                paginationContainer.appendChild(pageItem);
+            }
+        }
+
+        // Function to filter student cards based on search input
+        function filterStudentCards() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredData = studentData.filter(student => {
+                // Modify this condition to match your search requirements
+                return (
+                    student['First Name'].toLowerCase().includes(searchTerm) ||
+                    student['Last Name'].toLowerCase().includes(searchTerm) ||
+                    student['Email'].toLowerCase().includes(searchTerm) ||
+                    student['Phone Number'].toLowerCase().includes(searchTerm) ||
+                    student['Expected Graduation'].toLowerCase().includes(searchTerm) ||
+                    student['Start Date'].toLowerCase().includes(searchTerm) ||
+                    student['Position'].toLowerCase().includes(searchTerm) ||
+                    student['Group'].toLowerCase().includes(searchTerm) ||
+                    student['Assigned Mentor'].toLowerCase().includes(searchTerm)
+                );
+            });
+
+            currentPage = 1;
+            renderPagination();
+            renderFilteredStudentCards(filteredData);
+        }
+
+        // Function to render filtered student cards
+        function renderFilteredStudentCards(filteredData) {
+            container.innerHTML = '';
+
+            const startIndex = (currentPage - 1) * cardsPerPage;
+            let endIndex = startIndex + cardsPerPage;
+            if (endIndex > filteredData.length) {
+                endIndex = filteredData.length;
+            }
+            const paginatedData = filteredData.slice(startIndex, endIndex);
+
+            paginatedData.forEach(student => {
+                const card = createStudentCard(student);
+                container.appendChild(card);
+            });
+        }
+
+        // Fetch the student data on page load
+        document.addEventListener('DOMContentLoaded', fetchStudentData);
+
+        // Event listener for search input
+        searchInput.addEventListener('input', filterStudentCards);
+    </script>
+</body>
+</html>
+
