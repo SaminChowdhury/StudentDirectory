@@ -240,45 +240,45 @@
             });
         }
 
-// Function to create a single student card
-function createStudentCard(student) {
-    const card = document.createElement('div');
-    card.className = 'card';
-
-    const cardImage = document.createElement('div');
-    cardImage.className = 'card-image';
-
-    const studentImage = document.createElement('img');
-    const studentId = student['ID Number'];
-    studentImage.src = `/student_images/${studentId}.jpeg`;
-    cardImage.appendChild(studentImage);
-
-    const cardContent = document.createElement('div');
-    cardContent.className = 'card-content';
-
-    const cardHeader = document.createElement('div');
-    cardHeader.className = 'card-header';
-
-    const studentName = document.createElement('h5');
-    studentName.textContent = `${student['First Name']} ${student['Last Name']}`;
-    cardHeader.appendChild(studentName);
-
-    const cardInfo = document.createElement('div');
-    cardInfo.className = 'card-info';
-    cardInfo.innerHTML = `Email: ${student['Email']}<br>Phone: ${student['Phone Number']}`;
-
-    cardContent.appendChild(cardHeader);
-    cardContent.appendChild(cardInfo);
-    card.appendChild(cardImage);
-    card.appendChild(cardContent);
-
-    // Open bio page when card is clicked
-    card.addEventListener('click', () => {
-        window.open(`bio_page.html?firstName=${student['First Name']}&lastName=${student['Last Name']}`, '_self');
-    });
-
-    return card;
-        }
+        // Function to create a single student card
+        function createStudentCard(student) {
+            const card = document.createElement('div');
+            card.className = 'card';
+        
+            const cardImage = document.createElement('div');
+            cardImage.className = 'card-image';
+        
+            const studentImage = document.createElement('img');
+            const studentId = student['ID Number'];
+            studentImage.src = `/student_images/${studentId}.jpeg`;
+            cardImage.appendChild(studentImage);
+        
+            const cardContent = document.createElement('div');
+            cardContent.className = 'card-content';
+        
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'card-header';
+        
+            const studentName = document.createElement('h5');
+            studentName.textContent = `${student['First Name']} ${student['Last Name']}`;
+            cardHeader.appendChild(studentName);
+        
+            const cardInfo = document.createElement('div');
+            cardInfo.className = 'card-info';
+            cardInfo.innerHTML = `Email: ${student['Email']}<br>Phone: ${student['Phone Number']}`;
+        
+            cardContent.appendChild(cardHeader);
+            cardContent.appendChild(cardInfo);
+            card.appendChild(cardImage);
+            card.appendChild(cardContent);
+        
+            // Open bio page when card is clicked
+            card.addEventListener('click', () => {
+                window.open(`bio_page.html?firstName=${student['First Name']}&lastName=${student['Last Name']}`, '_self');
+            });
+        
+            return card;
+                }
 
         // Function to render the pagination
         function renderPagination() {
